@@ -1,5 +1,3 @@
-let summaryGender = document.querySelector(".summary-section");
-
 const dataAndTitle = [
   {
     title: "S/N",
@@ -40,10 +38,6 @@ const instructorsTitle = [
     dataSort: "gender",
   },
   {
-    title: "Age",
-    dataSort: "age",
-  },
-  {
     title: "Course",
     dataSort: "course",
   },
@@ -69,83 +63,7 @@ const infoData = [
 let mainDiv = document.querySelector(".statistics-section");
 let teachersDiv = document.querySelector(".teachers-section");
 
-const repeatTable = (data) => {
-  let repeatedTable = "";
-
-  data.map((info) => {
-    repeatedTable += `
-    <div class="div-table full-statistics">
-      <h3>${info.track}</h3>
-      <div class="table-box">
-        <table
-          class="${info.class}"
-        >
-          <thead>
-            <tr></tr>
-          </thead>
-          <tbody id=${info.id}>
-            <tr>
-              <td><i>Loading...</i></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    `;
-  });
-
-  mainDiv.innerHTML = repeatedTable;
-};
-
-const repeatTeachersTable = () => {
-  let repeatedTable = "";
-    repeatedTable += `
-    <div class="div-table instruct-statistics">
-      <h3>Instructors</h3>
-      <div class="table-box">
-        <table
-        >
-          <thead>
-            <tr></tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><i>Loading...</i></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
-    `;
-
-  teachersDiv.innerHTML = repeatedTable;
-};
-
-window.addEventListener("DOMContentLoaded", repeatTable(infoData));
-window.addEventListener("DOMContentLoaded", repeatTeachersTable);
-let tHead = document.querySelectorAll(".full-statistics thead tr");
-let instructHead = document.querySelectorAll(".instruct-statistics thead tr");
-const generateHeadings = (titles) => {
-  let generatedTitles = "";
-  titles.map((el) => {
-    generatedTitles += `
-    <th
-    data-sort=${el.dataSort}
-    scope="col"
-    >
-    ${el.title}
-    </th>
-    `;
-  });
-
-  // console.log(generatedTitles);
-
-  tHead.innerHTML = generatedTitles;
-  tHead.forEach((th) => {
-    th.innerHTML = generatedTitles;
-  });
-};
-
+//generate heading for instructors
 const generateTeachersHeadings = (titles) => {
   let generatedTitles = "";
   titles.map((el) => {
@@ -158,18 +76,91 @@ const generateTeachersHeadings = (titles) => {
     </th>
     `;
   });
+  return generatedTitles
+};
 
-  console.log(generatedTitles);
-  console.log(instructHead)
+//generate tables for instructors
+const repeatTeachersTable = () => {
+  let repeatedTable = "";
+  repeatedTable += `
+  <div class="div-table instruct-statistics">
+    <h3>Instructors</h3>
+    <div class="table-box">
+      <table class="instructors-table">
+        <thead class="teachers-head">
+          <tr>${generateTeachersHeadings(instructorsTitle)}</tr>
+        </thead>
+        <tbody  id="teachers">
+          <tr>
+            <td><i>Loading...</i></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>`;
 
-  instructHead.innerHTML = generatedTitles;
-  instructHead.forEach((th) => {
+  teachersDiv.innerHTML = repeatedTable;
+};
+
+
+//repeat tables for tracks
+const repeatTable = (data) => {
+  let repeatedTable = "";
+  
+  data.map((info) => {
+    repeatedTable += `
+    <div class="div-table full-statistics">
+    <h3>${info.track}</h3>
+    <div class="table-box">
+    <table
+          class="${info.class}"
+          >
+          <thead>
+          <tr></tr>
+          </thead>
+          <tbody id=${info.id}>
+            <tr>
+            <td><i>Loading...</i></td>
+            </tr>
+          </tbody>
+          </table>
+      </div>
+      </div>
+    `;
+  });
+  
+  mainDiv.innerHTML = repeatedTable;
+};
+
+
+window.addEventListener("DOMContentLoaded", repeatTeachersTable);
+window.addEventListener("DOMContentLoaded", repeatTable(infoData));
+
+let tHead = document.querySelectorAll(".full-statistics thead tr");
+
+
+const generateHeadings = (titles) => {
+  let generatedTitles = "";
+  titles.map((el) => {
+    generatedTitles += `
+    <th
+    data-sort=${el.dataSort}
+    scope="col"
+    >
+    ${el.title}
+    </th>
+    `;
+  });
+  
+  
+  tHead.innerHTML = generatedTitles;
+  tHead.forEach((th) => {
     th.innerHTML = generatedTitles;
   });
+  
 };
 
 generateHeadings(dataAndTitle);
-generateTeachersHeadings(instructorsTitle);
 
 const repeatHTML = (result) => {
   let repeatedHTML = `
@@ -193,6 +184,7 @@ const repeatHTML = (result) => {
   `;
   return repeatedHTML;
 };
+
 const repeatTeachersHTML = (result) => {
   let repeatedHTML = `
       <tr>
@@ -209,7 +201,7 @@ const repeatTeachersHTML = (result) => {
         ${result.gender}
         </td>
         <td>
-        ${result.course}
+        ${result.course.join(', ')}
         </td>
       </tr>
   `;
@@ -249,8 +241,11 @@ let row1 = document.querySelector("#table-row1");
 let row2 = document.querySelector("#table-row2");
 let row3 = document.querySelector("#table-row3");
 
+
 let genderRow = document.querySelector(".gender-row");
 let ageRow = document.querySelector(".age-row");
+
+
 
 async function startApp() {
   const response = await fetch("./data.json");
@@ -258,7 +253,6 @@ async function startApp() {
 
   const instructor = result.TechSchool.Instructors;
 
-  const instructorMap = [];
 
   const students = result.TechSchool.Students;
 
@@ -266,17 +260,12 @@ async function startApp() {
   const frontHeading = document.querySelectorAll(".front-table thead tr th");
   const backHeading = document.querySelectorAll(".back-table thead tr th");
   const cloudHeading = document.querySelectorAll(".cloud-table thead tr th");
+  const instructorsHeading = document.querySelectorAll(".instructors-table thead tr th");
 
-  let fH =
-    frontHeading[0].parentElement.parentElement.parentElement.parentElement
-      .parentElement.firstElementChild.textContent;
-  let bH =
-    backHeading[0].parentElement.parentElement.parentElement.parentElement
-      .parentElement.firstElementChild.textContent;
-  let cH =
-    cloudHeading[0].parentElement.parentElement.parentElement.parentElement
-      .parentElement.firstElementChild.textContent;
 
+  const titleNames = ['Instructors', 'Frontend', 'Backend', 'Cloud']
+
+  
   //Add event listener to each column heading
   frontHeading.forEach((t) => {
     t.addEventListener("click", sort1, false);
@@ -286,6 +275,9 @@ async function startApp() {
   });
   cloudHeading.forEach((t) => {
     t.addEventListener("click", sort3, false);
+  });
+  instructorsHeading.forEach((t) => {
+    t.addEventListener("click", sortInstructors, false);
   });
 
   let sortCol;
@@ -303,18 +295,33 @@ async function startApp() {
       return 0;
     });
   }
+  function sortInstructor(e) {
+    let thisSort = e.target.dataset.sort;
+    if (sortCol === thisSort) sortAsc = !sortAsc;
+    sortCol = thisSort;
+
+    instructor.sort((a, b) => {
+      if (a[sortCol] < b[sortCol]) return sortAsc ? 1 : -1;
+      if (a[sortCol] > b[sortCol]) return sortAsc ? -1 : 1;
+      return 0;
+    });
+  }
 
   //sort the data in each object
+  function sortInstructors(e) {
+    sortInstructor(e)
+    generateTeachers(instructor)
+  }
   function sort1(e) {
-    sort(e, fH);
+    sort(e, titleNames[1]);
     generateStudent(frontend, row1);
   }
   function sort2(e) {
-    sort(e, bH);
+    sort(e, titleNames[2]);
     generateStudent(backend, row2);
   }
   function sort3(e) {
-    sort(e, cH);
+    sort(e, titleNames[3]);
     generateStudent(cloud, row3);
   }
 
@@ -490,12 +497,13 @@ async function startApp() {
   `;
 
   ageRow.innerHTML = generatedHTML;
-
+  
+  generateTeachers(instructor)
   generateGender(genderr);
   generateStudent(frontend, row1);
   generateStudent(backend, row2);
   generateStudent(cloud, row3);
-  generateTeachers(instructor)
+  
 }
 
 const generateStudent = (track, rows) => {
@@ -508,9 +516,9 @@ const generateStudent = (track, rows) => {
 const generateTeachers = (instructor) => {
   let generatedHTML = "";
   instructor.map((result) => {
-    generatedHTML += repeatHTML(result);
+    generatedHTML += repeatTeachersHTML(result);
   });
-  document.querySelector('teachers').innerHTML = generatedHTML;
+  document.querySelector('#teachers').innerHTML = generatedHTML;
 };
 const generateGender = (gender) => {
   let generatedHTML = "";
